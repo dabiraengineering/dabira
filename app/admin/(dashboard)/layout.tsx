@@ -1,14 +1,4 @@
-import Link from "next/link";
-import {
-  Users,
-  QrCode,
-  Layers,
-  FileText,
-  Settings,
-  UserCog,
-  Image as ImageIcon,
-  LogOut,
-} from "lucide-react";
+import { LogOut } from "lucide-react";
 import { requireStaffAuth } from "@/lib/dal";
 import { signOut } from "@/lib/actions/auth";
 import {
@@ -19,24 +9,12 @@ import {
   SidebarGroupContent,
   SidebarHeader,
   SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
-
-const navItems = [
-  { href: "/admin/leads", label: "Leads", icon: Users },
-  { href: "/admin/scans", label: "Scans", icon: QrCode },
-  { href: "/admin/cohorts", label: "Cohorts", icon: Layers },
-  { href: "/admin/content", label: "Content", icon: FileText },
-  { href: "/admin/media", label: "Media", icon: ImageIcon },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
-  { href: "/admin/staff", label: "Staff", icon: UserCog },
-];
+import { AdminNav } from "./admin-nav";
 
 export default async function DashboardLayout({
   children,
@@ -52,16 +30,7 @@ export default async function DashboardLayout({
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupContent>
-              <SidebarMenu>
-                {navItems.map((item) => (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton render={<Link href={item.href} />}>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
+              <AdminNav />
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>

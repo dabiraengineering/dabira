@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PasswordInput } from "@/components/password-input";
+import { AuthCancelLink } from "@/components/auth-cancel-link";
 
 export default function AccountLoginPage() {
   const [state, formAction, isPending] = useActionState(
@@ -55,6 +56,9 @@ export default function AccountLoginPage() {
               </Link>
             </p>
           </form>
+          <div className="mt-4">
+            <AuthCancelLink />
+          </div>
         </CardContent>
       </Card>
     </div>

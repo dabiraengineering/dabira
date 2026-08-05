@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PasswordInput } from "@/components/password-input";
+import { AuthCancelLink } from "@/components/auth-cancel-link";
 
 export default function AccountSignupPage() {
   const [state, formAction, isPending] = useActionState(
@@ -20,8 +21,9 @@ export default function AccountSignupPage() {
     return (
       <div className="mx-auto flex max-w-sm flex-col gap-6 px-4 py-20 sm:px-6">
         <Card>
-          <CardContent className="p-8 text-center">
+          <CardContent className="flex flex-col gap-4 p-8 text-center">
             <p>Check your email to confirm your account, then sign in.</p>
+            <AuthCancelLink />
           </CardContent>
         </Card>
       </div>
@@ -73,6 +75,9 @@ export default function AccountSignupPage() {
               </Link>
             </p>
           </form>
+          <div className="mt-4">
+            <AuthCancelLink />
+          </div>
         </CardContent>
       </Card>
     </div>

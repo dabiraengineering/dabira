@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OtpField } from "@/components/otp-field";
 import { PasswordInput } from "@/components/password-input";
+import { AuthCancelLink } from "@/components/auth-cancel-link";
 
 function PasswordLogin({ onUseCode }: { onUseCode: () => void }) {
   const [state, formAction, isPending] = useActionState(signIn, initialActionState);
@@ -122,12 +123,13 @@ export default function LoginPage() {
         <CardHeader>
           <CardTitle>Dabira Admin</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col gap-4">
           {mode === "password" ? (
             <PasswordLogin onUseCode={() => setMode("code")} />
           ) : (
             <CodeLogin onUsePassword={() => setMode("password")} />
           )}
+          <AuthCancelLink />
         </CardContent>
       </Card>
     </div>

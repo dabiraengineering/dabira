@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OtpField } from "@/components/otp-field";
 import { PasswordInput } from "@/components/password-input";
+import { AuthCancelLink } from "@/components/auth-cancel-link";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -29,7 +30,7 @@ export default function ForgotPasswordPage() {
         <CardHeader>
           <CardTitle>Reset password</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col gap-4">
           {!codeSent ? (
             <form
               action={async (formData) => {
@@ -90,6 +91,7 @@ export default function ForgotPasswordPage() {
               </Button>
             </form>
           )}
+          <AuthCancelLink />
         </CardContent>
       </Card>
     </div>
