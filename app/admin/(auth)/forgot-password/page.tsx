@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { OtpField } from "@/components/otp-field";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -67,15 +68,8 @@ export default function ForgotPasswordPage() {
                 Enter the 6-digit code sent to {email} and a new password.
               </p>
               <div className="flex flex-col gap-2">
-                <Label htmlFor="token">Code</Label>
-                <Input
-                  id="token"
-                  name="token"
-                  inputMode="numeric"
-                  maxLength={6}
-                  required
-                  autoFocus
-                />
+                <Label>Code</Label>
+                <OtpField name="token" autoFocus />
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="password">New password</Label>

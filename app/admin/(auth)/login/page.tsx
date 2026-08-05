@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { OtpField } from "@/components/otp-field";
 
 function PasswordLogin({ onUseCode }: { onUseCode: () => void }) {
   const [state, formAction, isPending] = useActionState(signIn, initialActionState);
@@ -99,15 +100,8 @@ function CodeLogin({ onUsePassword }: { onUsePassword: () => void }) {
         Enter the 6-digit code sent to {email}.
       </p>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="token">Code</Label>
-        <Input
-          id="token"
-          name="token"
-          inputMode="numeric"
-          maxLength={6}
-          required
-          autoFocus
-        />
+        <Label>Code</Label>
+        <OtpField name="token" autoFocus />
       </div>
       {verifyState.error && (
         <p className="text-sm text-destructive">{verifyState.error}</p>

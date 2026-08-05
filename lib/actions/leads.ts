@@ -3,6 +3,9 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { sendLeadSms, sendLeadEmail } from "@/lib/notifications/send";
+import { smsImmediate } from "@/lib/notifications/sms-templates";
+import { applicationEmail } from "@/lib/notifications/email-templates";
 import type { ActionState } from "@/lib/actions/types";
 
 const applicationSchema = z.object({
@@ -23,6 +26,15 @@ const applicationSchema = z.object({
   referralDetails: z.string().trim().optional(),
   smsConsent: z.coerce.boolean(),
 });
+
+// Best-effort E.164 normalization for US numbers, matching the format
+// the legacy Airtable system already stored ("+1XXXXXXXXXX").
+function normalizePhone(raw: string): string {
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  return raw.startsWith("+") ? raw : `+${digits}`;
+}
 
 export async function submitApplication(
   _prevState: ActionState,
@@ -45,11 +57,12 @@ export async function submitApplication(
   }
 
   const data = parsed.data;
+  const phone = normalizePhone(data.phone);
   const db = createServiceRoleClient();
 
   const { data: cohort } = await db
     .from("cohorts")
-    .select("id")
+    .select("id, compensation_usd, application_link_url")
     .eq("is_current", true)
     .single();
 
@@ -61,30 +74,58 @@ export async function submitApplication(
     .from("leads")
     .select("id")
     .eq("cohort_id", cohort.id)
-    .or(`phone.eq.${data.phone},email.ilike.${data.email}`)
+    .or(`phone.eq.${phone},email.ilike.${data.email}`)
     .maybeSingle();
 
   if (existing) {
     return { error: "You've already applied for this study." };
   }
 
-  const { error: insertError } = await db.from("leads").insert({
-    cohort_id: cohort.id,
-    lead_source: "study_application",
-    full_name: data.fullName,
-    email: data.email,
-    phone: data.phone,
-    age: data.age,
-    availability: data.availability,
-    english_comfort: data.englishComfort,
-    referral_source: data.referralSource,
-    referral_details: data.referralDetails || null,
-    sms_consent: data.smsConsent,
-    sms_consent_at: data.smsConsent ? new Date().toISOString() : null,
-  });
+  // "Immediate" path (SMS spec §SMS 1): the window is already open, so the
+  // application email + SMS go out right away instead of waiting on the
+  // cron-driven reminder/delivery flow used for waitlisted leads.
+  const sendsImmediately = Boolean(cohort.application_link_url);
 
-  if (insertError) {
+  const { data: inserted, error: insertError } = await db
+    .from("leads")
+    .insert({
+      cohort_id: cohort.id,
+      lead_source: "study_application",
+      full_name: data.fullName,
+      email: data.email,
+      phone,
+      age: data.age,
+      availability: data.availability,
+      english_comfort: data.englishComfort,
+      referral_source: data.referralSource,
+      referral_details: data.referralDetails || null,
+      sms_consent: data.smsConsent,
+      sms_consent_at: data.smsConsent ? new Date().toISOString() : null,
+      status: sendsImmediately ? "application_sent" : "new",
+      application_link_sent_at: sendsImmediately ? new Date().toISOString() : null,
+    })
+    .select("id")
+    .single();
+
+  if (insertError || !inserted) {
     return { error: "Something went wrong submitting your application." };
+  }
+
+  if (sendsImmediately && cohort.application_link_url) {
+    const firstName = data.fullName.trim().split(/\s+/)[0];
+    await sendLeadEmail(
+      inserted.id,
+      data.email,
+      "immediate",
+      applicationEmail({
+        firstName,
+        applicationLink: cohort.application_link_url,
+        compensationUsd: Number(cohort.compensation_usd),
+      })
+    );
+    if (data.smsConsent) {
+      await sendLeadSms(inserted.id, phone, "immediate", smsImmediate(firstName));
+    }
   }
 
   redirect("/apply/thank-you");
