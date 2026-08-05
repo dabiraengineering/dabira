@@ -53,9 +53,11 @@ export default async function StaffPage() {
             />
           ))}
           {(!staff || staff.length === 0) && (
-            <TableCell colSpan={3} className="text-center text-sm text-muted-foreground">
-              No staff yet.
-            </TableCell>
+            <TableRow>
+              <TableCell colSpan={3} className="text-center text-sm text-muted-foreground">
+                No staff yet.
+              </TableCell>
+            </TableRow>
           )}
         </TableBody>
       </Table>

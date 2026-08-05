@@ -41,17 +41,19 @@ export default async function CohortsPage() {
         <TableBody>
           {(cohorts ?? []).map((cohort) => (
             <TableRow key={cohort.id}>
-              <TableCell className="font-medium">
+              <TableCell className="max-w-40 truncate font-medium">
                 {cohort.study_title}
               </TableCell>
-              <TableCell className="flex gap-1">
-                {cohort.is_current && <Badge>Current</Badge>}
-                {cohort.is_waitlist && (
-                  <Badge variant="secondary">Waitlist</Badge>
-                )}
+              <TableCell>
+                <div className="flex gap-1">
+                  {cohort.is_current && <Badge>Current</Badge>}
+                  {cohort.is_waitlist && (
+                    <Badge variant="secondary">Waitlist</Badge>
+                  )}
+                </div>
               </TableCell>
-              <TableCell>${cohort.compensation_usd}</TableCell>
-              <TableCell>{cohort.starts_on}</TableCell>
+              <TableCell className="whitespace-nowrap">${cohort.compensation_usd}</TableCell>
+              <TableCell className="whitespace-nowrap">{cohort.starts_on}</TableCell>
               <TableCell className="text-right">
                 <CohortRowActions
                   id={cohort.id}

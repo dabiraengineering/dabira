@@ -25,9 +25,11 @@ export function FlyerCodeRow({
 
   return (
     <TableRow>
-      <TableCell className="font-mono text-sm">{code}</TableCell>
-      <TableCell className="capitalize">{borough.replace(/_/g, " ")}</TableCell>
-      <TableCell className="text-sm text-muted-foreground">{campaignLabel ?? "—"}</TableCell>
+      <TableCell className="max-w-32 truncate font-mono text-sm">{code}</TableCell>
+      <TableCell className="whitespace-nowrap capitalize">{borough.replace(/_/g, " ")}</TableCell>
+      <TableCell className="max-w-40 truncate text-sm text-muted-foreground">
+        {campaignLabel ?? "—"}
+      </TableCell>
       <TableCell>
         <Switch
           checked={isActive}
