@@ -64,13 +64,26 @@ export async function signInApplicant(
   }
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     return { error: "Invalid email or password." };
   }
 
-  redirect("/account");
+  // Staff and applicant accounts share the same Supabase Auth users, so
+  // it's easy to land here (e.g. via the header's account icon) with
+  // staff credentials. Send them straight to the dashboard instead of
+  // leaving them on the applicant portal wondering where the admin
+  // side went.
+  const db = createServiceRoleClient();
+  const { data: staffRecord } = await db
+    .from("staff")
+    .select("id")
+    .eq("id", data.user.id)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  redirect(staffRecord ? "/admin" : "/account");
 }
 
 export async function signOutApplicant() {

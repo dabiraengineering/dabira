@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
 import { requireApplicantAuth } from "@/lib/dal";
 import { signOutApplicant } from "@/lib/actions/account";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
@@ -18,11 +20,19 @@ const STATUS_LABEL: Record<string, string> = {
 export default async function AccountPage() {
   const applicant = await requireApplicantAuth();
   const db = createServiceRoleClient();
-  const { data: leads } = await db
-    .from("leads")
-    .select("id, status, created_at, cohorts(study_title)")
-    .eq("user_id", applicant.id)
-    .order("created_at", { ascending: false });
+  const [{ data: leads }, { data: staffRecord }] = await Promise.all([
+    db
+      .from("leads")
+      .select("id, status, created_at, cohorts(study_title)")
+      .eq("user_id", applicant.id)
+      .order("created_at", { ascending: false }),
+    db
+      .from("staff")
+      .select("id")
+      .eq("id", applicant.id)
+      .eq("is_active", true)
+      .maybeSingle(),
+  ]);
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-16 sm:px-6">
@@ -37,6 +47,24 @@ export default async function AccountPage() {
           </Button>
         </form>
       </div>
+
+      {/* This account also has staff access — this page will never show
+          an admin dashboard link on its own, so surface the way there
+          directly rather than leaving staff stuck on the applicant
+          portal after using the wrong login page. */}
+      {staffRecord && (
+        <Card className="border-primary/30 bg-primary/5">
+          <CardContent className="flex items-center justify-between gap-3 p-4">
+            <div className="flex items-center gap-2 text-sm">
+              <ShieldCheck className="h-4 w-4 text-primary" />
+              This account also has admin access.
+            </div>
+            <Button size="sm" render={<Link href="/admin" />} nativeButton={false}>
+              Go to dashboard
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {!leads || leads.length === 0 ? (
         <p className="text-sm text-muted-foreground">

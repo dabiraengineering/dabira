@@ -56,8 +56,14 @@ export default function AccountLoginPage() {
               </Link>
             </p>
           </form>
-          <div className="mt-4">
+          <div className="mt-4 flex flex-col gap-2">
             <AuthCancelLink />
+            <Link
+              href="/admin/login"
+              className="text-center text-xs text-muted-foreground hover:underline"
+            >
+              Dabira staff? Sign in here
+            </Link>
           </div>
         </CardContent>
       </Card>
