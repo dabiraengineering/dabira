@@ -1,11 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/lib/database.types";
 
 // Server-only: bypasses RLS entirely. Never import this from a Client
 // Component or expose SUPABASE_SERVICE_ROLE_KEY via NEXT_PUBLIC_*.
 // This is how the app reads/writes all app tables — the browser never
 // talks to Supabase directly except the Auth handshake (see server.ts).
 export function createServiceRoleClient() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { persistSession: false } }

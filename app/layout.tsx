@@ -42,21 +42,30 @@ function contrastForeground(hex: string): string {
   return luminance > 0.6 ? "oklch(0.145 0 0)" : "oklch(1 0 0)";
 }
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const db = createServiceRoleClient();
-  const { data: settings } = await db
-    .from("site_settings")
-    .select("primary_color_hex")
-    .single();
+async function getPrimaryColor(): Promise<string | null> {
+  try {
+    const db = createServiceRoleClient();
+    const { data } = await db
+      .from("site_settings")
+      .select("primary_color_hex")
+      .single();
+    return data?.primary_color_hex ?? null;
+  } catch {
+    // A Supabase hiccup should degrade to the default theme, never take
+    // down the whole site — this fetch runs on every single page.
+    return null;
+  }
+}
 
-  const themeStyle = settings?.primary_color_hex
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const primaryColorHex = await getPrimaryColor();
+
+  const themeStyle = primaryColorHex
     ? ({
-        "--primary": settings.primary_color_hex,
-        "--primary-foreground": contrastForeground(settings.primary_color_hex),
-        "--sidebar-primary": settings.primary_color_hex,
-        "--sidebar-primary-foreground": contrastForeground(
-          settings.primary_color_hex
-        ),
+        "--primary": primaryColorHex,
+        "--primary-foreground": contrastForeground(primaryColorHex),
+        "--sidebar-primary": primaryColorHex,
+        "--sidebar-primary-foreground": contrastForeground(primaryColorHex),
       } as React.CSSProperties)
     : undefined;
 
