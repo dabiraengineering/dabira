@@ -19,6 +19,7 @@ const cohortSchema = z.object({
   isWaitlist: z.coerce.boolean(),
   startsOn: z.string().trim().min(1),
   endsOn: z.string().trim().optional(),
+  imageId: z.string().trim().optional(),
 });
 
 function parseCohortForm(formData: FormData) {
@@ -34,6 +35,7 @@ function parseCohortForm(formData: FormData) {
     isWaitlist: formData.get("isWaitlist") === "on",
     startsOn: formData.get("startsOn"),
     endsOn: formData.get("endsOn"),
+    imageId: formData.get("imageId"),
   });
 }
 
@@ -61,6 +63,7 @@ export async function createCohort(
     is_waitlist: d.isWaitlist,
     starts_on: d.startsOn,
     ends_on: d.endsOn || null,
+    image_id: d.imageId || null,
   });
 
   if (error) return { error: error.message };
@@ -95,6 +98,7 @@ export async function updateCohort(
       is_waitlist: d.isWaitlist,
       starts_on: d.startsOn,
       ends_on: d.endsOn || null,
+      image_id: d.imageId || null,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);

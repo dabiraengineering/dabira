@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { MediaPicker, type MediaOption } from "@/components/media-picker";
 import type { ActionState } from "@/lib/actions/types";
 import type { Tables } from "@/lib/database.types";
 
@@ -13,9 +14,11 @@ type Cohort = Tables<"cohorts">;
 
 export function CohortForm({
   cohort,
+  media,
   action,
 }: {
   cohort?: Cohort;
+  media: MediaOption[];
   action: (state: ActionState, formData: FormData) => Promise<ActionState>;
 }) {
   const [state, formAction, isPending] = useActionState(action, {
@@ -124,6 +127,11 @@ export function CohortForm({
           type="url"
           defaultValue={cohort?.application_link_url ?? ""}
         />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label>Study image</Label>
+        <MediaPicker name="imageId" media={media} defaultValue={cohort?.image_id} />
       </div>
 
       <div className="flex items-center gap-2">

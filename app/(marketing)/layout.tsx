@@ -10,6 +10,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { SocialIcon } from "@/components/social-icon";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV_LINKS = [
   { href: "/#study", label: "Current study" },
@@ -52,6 +53,7 @@ export default async function MarketingLayout({
           </nav>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Button
               render={<Link href="/apply" />}
               nativeButton={false}

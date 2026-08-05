@@ -42,6 +42,58 @@ function contrastForeground(hex: string): string {
   return luminance > 0.6 ? "oklch(0.145 0 0)" : "oklch(1 0 0)";
 }
 
+function hexToHsl(hex: string): [number, number, number] {
+  const clean = hex.replace("#", "");
+  const r = parseInt(clean.slice(0, 2), 16) / 255;
+  const g = parseInt(clean.slice(2, 4), 16) / 255;
+  const b = parseInt(clean.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  let h = 0;
+  let s = 0;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      default:
+        h = (r - g) / d + 4;
+    }
+    h *= 60;
+  }
+  return [h, s * 100, l * 100];
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  s /= 100;
+  l /= 100;
+  const k = (n: number) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) =>
+    l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  const toHex = (n: number) =>
+    Math.round(f(n) * 255)
+      .toString(16)
+      .padStart(2, "0");
+  return `#${toHex(0)}${toHex(8)}${toHex(4)}`;
+}
+
+// A brand color tuned for readability on white often looks muddy/flat on
+// pure black — dark UIs generally need more lightness and saturation for
+// an accent to keep its "pop". Lighten + saturate a bit for the .dark
+// variant rather than reusing the light-mode hex verbatim.
+function brightenForDark(hex: string): string {
+  if (!/^#[0-9a-f]{6}$/i.test(hex)) return hex;
+  const [h, s, l] = hexToHsl(hex);
+  return hslToHex(h, Math.min(s + 12, 85), Math.min(l + 18, 68));
+}
+
 async function getPrimaryColor(): Promise<string | null> {
   try {
     const db = createServiceRoleClient();
@@ -69,6 +121,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       } as React.CSSProperties)
     : undefined;
 
+  const darkPrimary = primaryColorHex ? brightenForDark(primaryColorHex) : null;
+  const darkPrimaryForeground = darkPrimary ? contrastForeground(darkPrimary) : null;
+
   return (
     <html
       lang="en"
@@ -76,6 +131,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
       style={themeStyle}
     >
+      {darkPrimary && (
+        <head>
+          <style>{`.dark { --primary: ${darkPrimary}; --primary-foreground: ${darkPrimaryForeground}; --sidebar-primary: ${darkPrimary}; --sidebar-primary-foreground: ${darkPrimaryForeground}; }`}</style>
+        </head>
+      )}
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <TooltipProvider>{children}</TooltipProvider>

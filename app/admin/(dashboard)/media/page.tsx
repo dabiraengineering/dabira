@@ -1,20 +1,9 @@
-import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { getMediaOptions } from "@/lib/media";
 import { MediaUploadForm } from "./media-upload-form";
 import { MediaCard } from "./media-card";
 
 export default async function MediaPage() {
-  const db = createServiceRoleClient();
-  const { data: media } = await db
-    .from("media")
-    .select("id, storage_bucket, storage_path, alt_text")
-    .order("created_at", { ascending: false });
-
-  const items = (media ?? []).map((row) => ({
-    id: row.id,
-    altText: row.alt_text,
-    url: db.storage.from(row.storage_bucket).getPublicUrl(row.storage_path).data
-      .publicUrl,
-  }));
+  const items = await getMediaOptions();
 
   return (
     <div className="flex flex-col gap-6">
