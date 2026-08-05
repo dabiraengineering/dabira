@@ -6,8 +6,10 @@ import { NextResponse, type NextRequest } from "next/server";
 // and every mutating Server Action/Route Handler independently calls
 // requireStaffAuth() (see lib/dal.ts), because proxy-based gating alone
 // does not protect Server Actions in Next.js 16.
+const PUBLIC_ADMIN_PATHS = ["/admin/login", "/admin/forgot-password"];
+
 export async function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname === "/admin/login") {
+  if (PUBLIC_ADMIN_PATHS.includes(request.nextUrl.pathname)) {
     return NextResponse.next();
   }
 
