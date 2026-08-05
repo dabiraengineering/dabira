@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { z } from "zod";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -61,6 +62,10 @@ export async function submitApplication(
   const phone = normalizePhone(data.phone);
   const db = createServiceRoleClient();
 
+  // Set by /api/scan/[code] when this visitor arrived via a flyer QR code.
+  const cookieStore = await cookies();
+  const scanId = cookieStore.get("scan_id")?.value ?? null;
+
   // If the visitor is already signed in with an applicant account,
   // attach this submission to it so it shows up in "My applications".
   const authClient = await createSupabaseServerClient();
@@ -112,12 +117,17 @@ export async function submitApplication(
       status: sendsImmediately ? "application_sent" : "new",
       application_link_sent_at: sendsImmediately ? new Date().toISOString() : null,
       user_id: user?.id ?? null,
+      source_scan_id: scanId,
     })
     .select("id")
     .single();
 
   if (insertError || !inserted) {
     return { error: "Something went wrong submitting your application." };
+  }
+
+  if (scanId) {
+    await db.from("scans").update({ lead_id: inserted.id }).eq("id", scanId);
   }
 
   if (sendsImmediately && cohort.application_link_url) {

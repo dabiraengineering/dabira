@@ -211,6 +211,7 @@ export type Database = {
       leads: {
         Row: {
           age: number | null
+          airtable_record_id: string | null
           application_link_sent_at: string | null
           availability: Database["public"]["Enums"]["lead_availability"] | null
           cohort_id: string | null
@@ -234,6 +235,7 @@ export type Database = {
         }
         Insert: {
           age?: number | null
+          airtable_record_id?: string | null
           application_link_sent_at?: string | null
           availability?: Database["public"]["Enums"]["lead_availability"] | null
           cohort_id?: string | null
@@ -261,6 +263,7 @@ export type Database = {
         }
         Update: {
           age?: number | null
+          airtable_record_id?: string | null
           application_link_sent_at?: string | null
           availability?: Database["public"]["Enums"]["lead_availability"] | null
           cohort_id?: string | null
@@ -429,6 +432,7 @@ export type Database = {
       }
       scans: {
         Row: {
+          airtable_record_id: string | null
           borough: Database["public"]["Enums"]["nyc_borough"]
           code: string | null
           converted: boolean | null
@@ -439,6 +443,7 @@ export type Database = {
           user_agent: string | null
         }
         Insert: {
+          airtable_record_id?: string | null
           borough: Database["public"]["Enums"]["nyc_borough"]
           code?: string | null
           converted?: boolean | null
@@ -449,6 +454,7 @@ export type Database = {
           user_agent?: string | null
         }
         Update: {
+          airtable_record_id?: string | null
           borough?: Database["public"]["Enums"]["nyc_borough"]
           code?: string | null
           converted?: boolean | null

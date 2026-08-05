@@ -43,7 +43,7 @@ export function MediaPicker({
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger render={<Button type="button" variant="outline" size="sm" />} nativeButton={false}>
+        <DialogTrigger render={<Button type="button" variant="outline" size="sm" />}>
           {selected ? "Change image" : "Choose image"}
         </DialogTrigger>
         <DialogContent className="max-w-2xl">
