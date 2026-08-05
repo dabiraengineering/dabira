@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# reference-only screenshots of the legacy site, not app source
+/ui-screenshots
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

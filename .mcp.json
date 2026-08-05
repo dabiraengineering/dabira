@@ -1,0 +1,44 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--read-only"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
+      }
+    },
+    "airtable": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "airtable-mcp-server"],
+      "env": {
+        "AIRTABLE_API_KEY": "${AIRTABLE_API_KEY}"
+      }
+    },
+    "make": {
+      "type": "http",
+      "url": "${MAKE_MCP_URL}"
+    },
+    "tally": {
+      "type": "http",
+      "url": "https://api.tally.so/mcp",
+      "headers": {
+        "Authorization": "Bearer ${TALLY_API_KEY}"
+      }
+    },
+    "vercel": {
+      "type": "http",
+      "url": "https://mcp.vercel.com"
+    },
+    "twilio": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@twilio-alpha/mcp", "${TWILIO_MCP_AUTH}"]
+    }
+  }
+}
