@@ -230,6 +230,7 @@ export type Database = {
           sms_consent_at: string | null
           source_scan_id: string | null
           status: Database["public"]["Enums"]["lead_status"]
+          user_id: string | null
         }
         Insert: {
           age?: number | null
@@ -256,6 +257,7 @@ export type Database = {
           sms_consent_at?: string | null
           source_scan_id?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
+          user_id?: string | null
         }
         Update: {
           age?: number | null
@@ -282,6 +284,7 @@ export type Database = {
           sms_consent_at?: string | null
           source_scan_id?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
+          user_id?: string | null
         }
         Relationships: [
           {

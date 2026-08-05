@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OtpField } from "@/components/otp-field";
+import { PasswordInput } from "@/components/password-input";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -73,10 +74,9 @@ export default function ForgotPasswordPage() {
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="password">New password</Label>
-                <Input
+                <PasswordInput
                   id="password"
                   name="password"
-                  type="password"
                   autoComplete="new-password"
                   required
                   minLength={8}

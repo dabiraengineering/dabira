@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OtpField } from "@/components/otp-field";
+import { PasswordInput } from "@/components/password-input";
 
 function PasswordLogin({ onUseCode }: { onUseCode: () => void }) {
   const [state, formAction, isPending] = useActionState(signIn, initialActionState);
@@ -29,10 +30,9 @@ function PasswordLogin({ onUseCode }: { onUseCode: () => void }) {
             Forgot password?
           </Link>
         </div>
-        <Input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           autoComplete="current-password"
           required
         />

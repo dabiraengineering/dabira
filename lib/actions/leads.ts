@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { sendLeadSms, sendLeadEmail } from "@/lib/notifications/send";
 import { smsImmediate } from "@/lib/notifications/sms-templates";
 import { applicationEmail } from "@/lib/notifications/email-templates";
@@ -60,6 +61,13 @@ export async function submitApplication(
   const phone = normalizePhone(data.phone);
   const db = createServiceRoleClient();
 
+  // If the visitor is already signed in with an applicant account,
+  // attach this submission to it so it shows up in "My applications".
+  const authClient = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await authClient.auth.getUser();
+
   const { data: cohort } = await db
     .from("cohorts")
     .select("id, compensation_usd, application_link_url")
@@ -103,6 +111,7 @@ export async function submitApplication(
       sms_consent_at: data.smsConsent ? new Date().toISOString() : null,
       status: sendsImmediately ? "application_sent" : "new",
       application_link_sent_at: sendsImmediately ? new Date().toISOString() : null,
+      user_id: user?.id ?? null,
     })
     .select("id")
     .single();

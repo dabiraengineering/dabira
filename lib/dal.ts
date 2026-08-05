@@ -47,3 +47,21 @@ export function requireRole(staff: AuthenticatedStaff, roles: StaffRole[]) {
     throw new Error("Forbidden");
   }
 }
+
+export type AuthenticatedApplicant = { id: string; email: string | null };
+
+// Applicant accounts are optional (see lib/actions/account.ts) — anyone
+// can still apply anonymously. This just gates the /account dashboard
+// for whoever chose to create one.
+export async function requireApplicantAuth(): Promise<AuthenticatedApplicant> {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/account/login");
+  }
+
+  return { id: user.id, email: user.email ?? null };
+}

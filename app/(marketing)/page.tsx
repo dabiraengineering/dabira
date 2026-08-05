@@ -132,7 +132,7 @@ export default async function HomePage() {
                   key={stat.id}
                   className="flex items-center gap-4 px-6 py-8 sm:justify-center"
                 >
-                  <Icon className="h-6 w-6 shrink-0 text-primary" />
+                  <Icon className="h-6 w-6 shrink-0 text-muted-foreground" />
                   <div>
                     <p className="font-heading text-2xl font-medium">
                       {stat.value}

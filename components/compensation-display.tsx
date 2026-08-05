@@ -54,7 +54,7 @@ export function CompensationDisplay({
         </span>
       )}
       <Select value={currency} onValueChange={handleChange}>
-        <SelectTrigger className="h-7 w-auto gap-1 border-none text-xs text-muted-foreground shadow-none">
+        <SelectTrigger className="h-7 w-auto gap-1 border-none text-base md:text-xs text-muted-foreground shadow-none">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

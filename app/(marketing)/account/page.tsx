@@ -1,0 +1,68 @@
+import { requireApplicantAuth } from "@/lib/dal";
+import { signOutApplicant } from "@/lib/actions/account";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+const STATUS_LABEL: Record<string, string> = {
+  new: "Received",
+  qualified: "Qualified",
+  waitlisted: "Waitlisted",
+  disqualified: "Not selected",
+  application_sent: "Application sent",
+  completed: "Completed",
+  no_show: "No-show",
+};
+
+export default async function AccountPage() {
+  const applicant = await requireApplicantAuth();
+  const db = createServiceRoleClient();
+  const { data: leads } = await db
+    .from("leads")
+    .select("id, status, created_at, cohorts(study_title)")
+    .eq("user_id", applicant.id)
+    .order("created_at", { ascending: false });
+
+  return (
+    <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-16 sm:px-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-heading text-2xl font-medium">My applications</h1>
+          <p className="text-sm text-muted-foreground">{applicant.email}</p>
+        </div>
+        <form action={signOutApplicant}>
+          <Button type="submit" variant="outline" size="sm">
+            Sign out
+          </Button>
+        </form>
+      </div>
+
+      {!leads || leads.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          No applications yet — apply to a study and it&apos;ll show up here.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {leads.map((lead) => (
+            <Card key={lead.id}>
+              <CardHeader className="flex-row items-center justify-between space-y-0">
+                <CardTitle className="text-base font-medium">
+                  {lead.cohorts?.study_title ?? "Study application"}
+                </CardTitle>
+                <Badge variant="secondary">
+                  {STATUS_LABEL[lead.status] ?? lead.status}
+                </Badge>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground">
+                  Applied {new Date(lead.created_at).toLocaleDateString()}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

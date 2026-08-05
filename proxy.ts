@@ -2,14 +2,20 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Optimistic cookie-presence check only — a fast redirect for logged-out
-// staff. This is NOT the real authorization boundary: every admin page
+// users. This is NOT the real authorization boundary: every gated page
 // and every mutating Server Action/Route Handler independently calls
-// requireStaffAuth() (see lib/dal.ts), because proxy-based gating alone
-// does not protect Server Actions in Next.js 16.
-const PUBLIC_ADMIN_PATHS = ["/admin/login", "/admin/forgot-password"];
+// requireStaffAuth()/requireApplicantAuth() (see lib/dal.ts), because
+// proxy-based gating alone does not protect Server Actions in Next.js 16.
+const PUBLIC_PATHS = [
+  "/admin/login",
+  "/admin/forgot-password",
+  "/account/login",
+  "/account/signup",
+];
 
 export async function proxy(request: NextRequest) {
-  if (PUBLIC_ADMIN_PATHS.includes(request.nextUrl.pathname)) {
+  const { pathname } = request.nextUrl;
+  if (PUBLIC_PATHS.includes(pathname)) {
     return NextResponse.next();
   }
 
@@ -41,13 +47,13 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    const loginUrl = new URL("/admin/login", request.url);
-    return NextResponse.redirect(loginUrl);
+    const loginPath = pathname.startsWith("/account") ? "/account/login" : "/admin/login";
+    return NextResponse.redirect(new URL(loginPath, request.url));
   }
 
   return response;
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/account/:path*"],
 };

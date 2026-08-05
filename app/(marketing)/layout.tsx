@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { Menu, User } from "lucide-react";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -23,13 +24,15 @@ export default async function MarketingLayout({
   children,
 }: LayoutProps<"/">) {
   const db = createServiceRoleClient();
-  const [{ data: settings }, { data: socials }] = await Promise.all([
+  const authClient = await createSupabaseServerClient();
+  const [{ data: settings }, { data: socials }, { data: { user } }] = await Promise.all([
     db.from("site_settings").select("contact_email").single(),
     db
       .from("social_links")
       .select("platform, url")
       .eq("is_visible", true)
       .order("position"),
+    authClient.auth.getUser(),
   ]);
 
   return (
@@ -54,6 +57,15 @@ export default async function MarketingLayout({
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            <Button
+              render={<Link href={user ? "/account" : "/account/login"} />}
+              nativeButton={false}
+              variant="ghost"
+              size="icon"
+              aria-label="My account"
+            >
+              <User />
+            </Button>
             <Button
               render={<Link href="/apply" />}
               nativeButton={false}
